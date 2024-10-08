@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using ServerLibrary.Data;
 using ServerLibrary.Helpers;
+using ServerLibrary.Repository.Contracts;
+using ServerLibrary.Repository.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(opt =>
     );
 
 builder.Services.Configure<JwtSection>(builder.Configuration.GetSection("JwtSection"));
+builder.Services.AddScoped<IUserAccount, UserAccountRepository>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowBlazorWasm", builder =>
+        builder.WithOrigins("https://localhost:7155")
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials()
+    );
+});
 
 var app = builder.Build();
 
@@ -26,6 +39,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowBlazorWasm");
 
 app.UseHttpsRedirection();
 
