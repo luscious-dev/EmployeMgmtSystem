@@ -1,0 +1,49 @@
+﻿@page "/identity/account/login"
+
+@inject GetHttpClient getHttpClient
+@inject IUserAccountService accountService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavManager
+
+<h3>Login</h3>
+
+<EditForm Model="user" OnValidSubmit="LoginHandler">
+    <DataAnnotationsValidator />
+    <div class="form-group mt-3">
+        <label>Email</label>
+        <InputText @bind-Value=@user.Email class="form-control"></InputText>
+        <ValidationMessage For=@(() => @user.Email) />
+    </div>
+
+    <div class="form-group mt-3">
+        <label>Password</label>
+        <InputText @bind-Value=@user.Password class="form-control"></InputText>
+        <ValidationMessage For=@(() => @user.Password) />
+    </div>
+
+    <div class="form-group mt-3">
+        <button class="btn btn-outline-primary float-end" type="submit">Login</button>
+    </div>
+</EditForm>
+
+@code {
+    Login user = new();
+
+    private async Task LoginHandler()
+    {
+        var client = getHttpClient.GetPublicHttpClient();
+        var result = await accountService.SignInAsync(user);
+
+        if (result.Flag)
+        {
+            var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+            await customAuthStateProvider.UpdateAuthenticationState(new UserSession()
+                {
+                    Token = result.Token,
+                    RefreshToken = result.RefreshToken
+                });
+
+            NavManager.NavigateTo("/", forceLoad: true);
+        }
+    }
+}
