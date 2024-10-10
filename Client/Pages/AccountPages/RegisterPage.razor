@@ -1,0 +1,51 @@
+﻿@page "/identity/account/register"
+@inject IUserAccountService accountService
+@inject NavigationManager navigationManager
+
+<h3>RegisterPage</h3>
+<EditForm Model="User" OnValidSubmit="HandleRegistration">
+    <DataAnnotationsValidator />
+    
+    <div class="card">
+        <div class="card-header">Fill this form to register</div>
+        <div class="card-body">
+            <div class="form-group">
+                <label class="form-label">Fullname</label>
+                <InputText @bind-Value="User.Fullname" class="form-control"></InputText>
+            </div>
+            <div class="form-group mt-3">
+                <label class="form-label">Email</label>
+                <InputText @bind-value="User.Email" class="form-control"></InputText>
+            </div>
+            <div class="form-group mt-3">
+                <label class="form-label">Password</label>
+                <input type="password" @bind-value="User.Password" class="form-control"></input>
+            </div>
+            <div class="form-group mt-3">
+                <label class="form-label">Fullname</label>
+                <input type="password" @bind="User.ConfirmPassword" class="form-control"></input>
+            </div>
+            <div class="form-group mt-3">
+                <button class="btn btn-outline-primary float-end" type="submit">Register</button> 
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private Register User = new();
+
+    private async Task HandleRegistration()
+    {
+        var result = await accountService.CreateAsync(User);
+
+        if (result.Flag)
+        {
+            User = new();
+        }
+        else
+        {
+            
+        }
+    }
+}

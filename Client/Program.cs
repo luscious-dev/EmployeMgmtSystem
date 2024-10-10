@@ -18,9 +18,11 @@ builder.Services.AddScoped<GetHttpClient>();
 builder.Services.AddScoped<LocalStorageService>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+builder.Services.AddTransient<CustomHttpHandler>();
+
 builder.Services.AddHttpClient("SystemApiClient", client =>
 {
     client.BaseAddress = new Uri("https://localhost:7085");
-});
+}).AddHttpMessageHandler<CustomHttpHandler>();
 
 await builder.Build().RunAsync();
